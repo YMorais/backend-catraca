@@ -64,12 +64,23 @@ def cadastrar_aluno():
 # ---------------------------
 @app.route('/academia_consulta/<cpf>', methods=['GET'])
 def consultar_aluno(cpf):
-    aluno = consultar_aluno.get(cpf)
+    try:
+        # Consulta a coleção 'alunos' onde o campo 'cpf' é igual ao CPF fornecido
+        alunos_ref = db.collection('alunos')
+        query = alunos_ref.where('cpf', '==', cpf).limit(1) # Limita a 1 resultado, pois o CPF deve ser único
 
-    if aluno:
-        return jsonify({'cpf': cpf, 'nome': aluno['nome'], 'status': aluno['status']}), 200
-    else:
-        return jsonify({'mensagem': 'Aluno não encontrado.'}), 404
+        resultados = query.get()
+
+        if resultados:
+            # Se encontrarmos um documento, pegamos o primeiro (e único) resultado
+            aluno_doc = resultados[0]
+            aluno_data = aluno_doc.to_dict()
+            return jsonify({'cpf': cpf, 'nome': aluno_data.get('nome'), 'status': aluno_data.get('status')}), 200
+        else:
+            return jsonify({'mensagem': 'Aluno não encontrado.'}), 404
+    except Exception as e:
+        return jsonify({'mensagem': f'Erro ao consultar o banco de dados: {str(e)}'}), 500
+
 
 
 
