@@ -46,20 +46,47 @@ def listar_alunos():
 # ---------------------------
 @app.route('/academia_cadastro', methods=['POST'])
 def cadastrar_aluno():
-    dados = request.json  
+    dados = request.json
     cpf = dados.get('cpf')
+    nome = dados.get('nome')
+    status = dados.get('status')
 
-    # Verifica se o CPF já está cadastrado
-    if cpf in cadastrar_aluno:
-        return jsonify({'mensagem': 'CPF já cadastrado.'}), 400
+    if not cpf:
+        return jsonify({'mensagem': 'CPF não enviado.'}), 400
+    if not nome:
+        return jsonify({'mensagem': 'Nome não enviado.'}), 400
+    if status is None: # Permite status booleano (True/False)
+        return jsonify({'mensagem': 'Status não enviado.'}), 400
 
-    cadastrar_aluno[cpf] = {
-        'nome': dados.get('nome'),
-        'status': dados.get('status')  
-    }
-    return jsonify({'mensagem': 'Aluno cadastrado com sucesso.'}), 201
+    try:
+        # Verifica se já existe um aluno com o CPF fornecido
+        alunos_ref = db.collection('alunos')
+        query = alunos_ref.where('cpf', '==', cpf).limit(1)
+        resultados = query.get()
 
+        if resultados:
+            return jsonify({'mensagem': f'CPF "{cpf}" já cadastrado.'}), 409 # Código 409 Conflict
+        else:
+            # Se o CPF não existe, cadastramos o novo aluno
+            novo_aluno = {
+                'cpf': cpf,
+                'nome': nome,
+                'status': status
+            }
+            # Aqui você precisa definir um ID para o documento.
+            # Você pode usar o próprio CPF como ID (se fizer sentido para sua lógica),
+            # ou deixar o Firestore gerar um ID automático.
 
+            # Opção 1: Usar o CPF como ID do documento
+            db.collection('alunos').document(cpf).set(novo_aluno)
+
+            # Opção 2: Deixar o Firestore gerar um ID automático
+            # db.collection('alunos').add(novo_aluno)
+
+            return jsonify({'mensagem': 'Aluno cadastrado com sucesso.', 'aluno': novo_aluno}), 201
+        
+    except Exception as e:
+        return jsonify({'mensagem': f'Erro ao acessar o banco de dados: {str(e)}'}), 500
 
 # ---------------------------
 # Rota para consultar aluno
