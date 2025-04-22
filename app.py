@@ -83,10 +83,10 @@ def cadastrar_aluno():
         return jsonify({'mensagem': f'Erro ao acessar o banco de dados: {str(e)}'}), 500
 
 # ---------------------------
-# Rota para consultar aluno (para edição)
+# Rota para consultar aluno (para edição e outros sistemas)
 # ---------------------------
-@app.route('/academia_edicao/<cpf>', methods=['GET'])
-def consultar_aluno(cpf):
+@app.route('/academia/aluno/<cpf>', methods=['GET'])
+def consultar_aluno_por_cpf(cpf):
     try:
         aluno_ref = db.collection('alunos').document(cpf)
         doc = aluno_ref.get()
@@ -94,10 +94,10 @@ def consultar_aluno(cpf):
             aluno_data = doc.to_dict()
             return jsonify({'id': doc.id, 'cpf': aluno_data.get('cpf'), 'nome': aluno_data.get('nome'), 'status': aluno_data.get('status')}), 200
         else:
-            return jsonify({'mensagem': 'Aluno não encontrado.'}), 404
+            return jsonify({'mensagem': f'Aluno com CPF "{cpf}" não encontrado.'}), 404
     except Exception as e:
         return jsonify({'mensagem': f'Erro ao consultar o banco de dados: {str(e)}'}), 500
-
+    
 # ---------------------------
 # Rota para editar aluno
 # ---------------------------
