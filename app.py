@@ -78,10 +78,10 @@ def cadastrar_aluno():
             # ou deixar o Firestore gerar um ID automático.
 
             # Opção 1: Usar o CPF como ID do documento
-            db.collection('alunos').document(cpf).set(novo_aluno)
+            # db.collection('alunos').document(cpf).set(novo_aluno)
 
             # Opção 2: Deixar o Firestore gerar um ID automático
-            # db.collection('alunos').add(novo_aluno)
+            db.collection('alunos').add(novo_aluno)
 
             return jsonify({'mensagem': 'Aluno cadastrado com sucesso.', 'aluno': novo_aluno}), 201
         
