@@ -48,7 +48,7 @@ Este projeto é um sistema de controle de acesso para uma academia, com funciona
 ---
 
 ## 👥 Autores  
-- Manoela Bavia Camargo Pereira - [GitHub](hhttps://github.com/YMorais/) - yasmim.morais.senai@gmail.com
+- Yasmim Bueno de Morais - [GitHub](hhttps://github.com/YMorais/) - yasmim.morais.senai@gmail.com
 
 ---
 
